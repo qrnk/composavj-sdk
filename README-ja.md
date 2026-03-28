@@ -1,34 +1,34 @@
 # Composa VJ Plugin SDK
 
-Plugin development kit for [Composa VJ](https://composavj.qrnk.jp) — a real-time visual performance instrument for macOS.
-Build custom **Effect**, **Transition**, and **Source** plugins with ComposaSDK.framework.
+[Composa VJ](https://composavj.qrnk.jp) 向けのプラグイン開発キットです。
+ComposaSDK.framework を使って、カスタム **Effect**・**Transition**・**Source** プラグインを開発できます。
 
-**[日本語ドキュメント](./README-ja.md)**
+**[English documentation](./README.md)**
 
 ## Contents
 
 | Directory | Description |
 |-----------|-------------|
-| `ComposaSDK.framework/` | SDK binary (macOS, arm64/x86_64) |
-| `ComposaSampleEffects/` | Effect plugin samples (Pixelate, RGB Shift, Mirror) |
-| `ComposaSampleTransitions/` | Transition plugin samples (Zoom, Slide) |
-| `ComposaYouTubePlugin.bundle/` | YouTube source plugin |
+| `ComposaSDK.framework/` | SDK バイナリ（macOS, arm64/x86_64） |
+| `ComposaSampleEffects/` | Effect プラグインサンプル（Pixelate, RGB Shift, Mirror） |
+| `ComposaSampleTransitions/` | Transition プラグインサンプル（Zoom, Slide） |
+| `ComposaYouTubePlugin.bundle/` | YouTube ソースプラグイン |
 
 ## Quick Start
 
-### 1. Create a Project
+### 1. プロジェクト作成
 
-Create a new **macOS Bundle** target in Xcode.
+Xcode で **macOS Bundle** ターゲットを作成します。
 
-### 2. Link the SDK
+### 2. SDK をリンク
 
-Drag `ComposaSDK.framework` into your project and add it to Frameworks.
+`ComposaSDK.framework` をプロジェクトにドラッグし、Frameworks に追加します。
 
 Build Settings:
-- **Framework Search Paths**: path to the SDK's parent directory
+- **Framework Search Paths**: SDK の親ディレクトリを指定
 - **Runpath Search Paths**: `@loader_path/../Frameworks`
 
-### 3. Implement the Entry Point
+### 3. エントリポイントを実装
 
 ```swift
 import Foundation
@@ -42,24 +42,24 @@ class MyPluginEntry: NSObject, PluginEntry {
 }
 ```
 
-### 4. Configure Info.plist
+### 4. Info.plist に設定
 
 ```xml
 <key>ComposaPluginClass</key>
 <string>MyPluginEntry</string>
 ```
 
-> The value of `ComposaPluginClass` must match the name specified in `@objc(...)`.
+> `ComposaPluginClass` の値は `@objc(...)` で指定した名前と一致させてください。
 
-### 5. Build & Install
+### 5. ビルド & インストール
 
-Place the built `.bundle` in the Plugins folder:
+ビルドした `.bundle` を Plugins フォルダに配置します:
 
 ```
 ~/Library/Application Support/ComposaVJ/Plugins/
 ```
 
-In Composa VJ, go to the gear menu → **Open Plugins Folder** to reveal it in Finder.
+Composa VJ のギアメニュー → **Open Plugins Folder** で Finder から開けます。
 
 ---
 
@@ -67,7 +67,7 @@ In Composa VJ, go to the gear menu → **Open Plugins Folder** to reveal it in F
 
 ### Effect Plugin
 
-Apply real-time effects to video. Implemented with Metal shaders.
+映像にリアルタイムエフェクトを適用します。Metal シェーダーで実装します。
 
 ```swift
 struct MyEffect: EffectShader {
@@ -98,7 +98,7 @@ struct MyEffect: EffectShader {
             float2 uv = position.xy / float2(inputTexture.get_width(),
                                               inputTexture.get_height());
             float4 color = inputTexture.sample(s, uv);
-            // Apply your effect here
+            // エフェクト処理をここに実装
             return color;
         }
         """
@@ -106,30 +106,30 @@ struct MyEffect: EffectShader {
 }
 ```
 
-**Registration:**
+**登録:**
 
 ```swift
-manager.registerEffect(MyEffect())               // Register to "Custom" bank
-manager.registerEffect(MyEffect(), bank: "My FX") // Register to a named bank
+manager.registerEffect(MyEffect())               // "Custom" Bank に登録
+manager.registerEffect(MyEffect(), bank: "My FX") // Bank 名を指定
 ```
 
 #### EffectParameter
 
-Values controlled by the XY Pad or sliders. Bound to uniforms in the order they appear in the `parameters` array.
+XY Pad やスライダーから制御される値です。`parameters` 配列の順序で Uniform にバインドされます。
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `id` | `String` | Parameter ID |
-| `label` | `String` | Display name |
-| `defaultValue` | `Double` | Initial value |
-| `min` | `Double` | Minimum value |
-| `max` | `Double` | Maximum value |
+| `id` | `String` | パラメータ ID |
+| `label` | `String` | UI 表示名 |
+| `defaultValue` | `Double` | 初期値 |
+| `min` | `Double` | 最小値 |
+| `max` | `Double` | 最大値 |
 
 ---
 
 ### Transition Plugin
 
-Composite Bus A/B visuals with a transition. Implemented with Metal shaders.
+Bus A/B の映像を合成するトランジションです。Metal シェーダーで実装します。
 
 ```swift
 struct MyTransition: TransitionShader {
@@ -166,7 +166,7 @@ struct MyTransition: TransitionShader {
 }
 ```
 
-**Registration:**
+**登録:**
 
 ```swift
 manager.registerTransition(MyTransition())
@@ -176,14 +176,14 @@ manager.registerTransition(MyTransition())
 
 | Value | Description |
 |-------|-------------|
-| `.smooth` | Follows crossfader (continuous) |
-| `.snap` | Instant switch at threshold |
+| `.smooth` | Crossfader に追従（連続値） |
+| `.snap` | 閾値で瞬時切替 |
 
 ---
 
 ### Source Plugin
 
-Fetch video from external sources (streaming, generators, etc.).
+外部ソース（ストリーミング、ジェネレーター等）から映像を取得します。
 
 ```swift
 class MySourcePlugin: SourcePlugin {
@@ -191,7 +191,7 @@ class MySourcePlugin: SourcePlugin {
     let name = "My Source"
     let sourceType: SourceType = .generator
 
-    // Form displayed when adding a source (nil for immediate creation)
+    // ソース追加時のフォーム定義（nil なら即作成）
     var addSourceForm: [PluginFormField]? {
         [
             .text(id: "url", label: "URL", placeholder: "https://..."),
@@ -215,7 +215,7 @@ class MySourcePlugin: SourcePlugin {
     }
 
     func createFrameProvider(for source: SourceDefinition) -> FrameProvider? {
-        // Return your FrameProvider implementation
+        // FrameProvider を返す
         return nil
     }
 
@@ -225,7 +225,7 @@ class MySourcePlugin: SourcePlugin {
 }
 ```
 
-**Registration:**
+**登録:**
 
 ```swift
 manager.register(MySourcePlugin())
@@ -233,13 +233,13 @@ manager.register(MySourcePlugin())
 
 #### PluginFormField
 
-Declaratively define form UI for source creation.
+ソース追加時のフォーム UI を宣言的に定義します。
 
 | Case | Parameters | Description |
 |------|-----------|-------------|
-| `.text` | `id`, `label`, `placeholder` | Text input |
-| `.number` | `id`, `label`, `min`, `max`, `defaultValue` | Number input |
-| `.selection` | `id`, `label`, `options: [SelectionOption]` | Dropdown selection |
+| `.text` | `id`, `label`, `placeholder` | テキスト入力 |
+| `.number` | `id`, `label`, `min`, `max`, `defaultValue` | 数値入力 |
+| `.selection` | `id`, `label`, `options: [SelectionOption]` | ドロップダウン選択 |
 
 #### FrameProvider Protocol
 
@@ -259,34 +259,34 @@ public protocol FrameProvider {
 
 | Protocol | Description |
 |----------|-------------|
-| `PluginEntry` | Plugin entry point. Implement `registerPlugins(manager:)` |
-| `EffectShader` | Effect definition (Metal shader + parameters) |
-| `TransitionShader` | Transition definition (Metal shader + controlType) |
-| `SourcePlugin` | Source plugin definition (form + FrameProvider creation) |
-| `FrameProvider` | Frame supply (`frame(at:)` returns CVPixelBuffer) |
+| `PluginEntry` | プラグインのエントリポイント。`registerPlugins(manager:)` を実装 |
+| `EffectShader` | エフェクトの定義（Metal シェーダー + パラメータ） |
+| `TransitionShader` | トランジションの定義（Metal シェーダー + controlType） |
+| `SourcePlugin` | ソースプラグインの定義（フォーム + FrameProvider 生成） |
+| `FrameProvider` | フレーム供給（`frame(at:)` で CVPixelBuffer を返す） |
 
 ### PluginManager (Registration)
 
 | Method | Description |
 |--------|-------------|
-| `register(_ plugin: SourcePlugin)` | Register a Source Plugin |
-| `registerEffect(_ effect: EffectShader)` | Register an Effect to "Custom" bank |
-| `registerEffect(_ effect: EffectShader, bank: String)` | Register an Effect to a named bank |
-| `registerTransition(_ transition: TransitionShader)` | Register a Transition |
+| `register(_ plugin: SourcePlugin)` | Source Plugin を登録 |
+| `registerEffect(_ effect: EffectShader)` | Effect を "Custom" Bank に登録 |
+| `registerEffect(_ effect: EffectShader, bank: String)` | Effect を指定 Bank に登録 |
+| `registerTransition(_ transition: TransitionShader)` | Transition を登録 |
 
 ### Data Types
 
 | Type | Description |
 |------|-------------|
 | `VideoFrame` | `timestamp: TimeInterval` + `pixelBuffer: CVPixelBuffer` |
-| `SourceDefinition` | Source definition (ID, name, type, locator, metadata) |
-| `SourceType` | `.videoFile`, `.image`, `.generator`, `.youtube`, etc. |
-| `EffectParameter` | Effect parameter (ID, label, range, default value) |
-| `EffectInstance` | Runtime effect instance (holds parameter values) |
+| `SourceDefinition` | ソースの定義（ID, 名前, タイプ, ロケーター, メタデータ） |
+| `SourceType` | `.videoFile`, `.image`, `.generator`, `.youtube` 等 |
+| `EffectParameter` | エフェクトパラメータ（ID, ラベル, 範囲, デフォルト値） |
+| `EffectInstance` | エフェクトの実行インスタンス（パラメータ値を保持） |
 
 ### CommandServiceClient
 
-XPC client for executing external commands in a sandboxed environment.
+サンドボックス環境で外部コマンドを実行するための XPC クライアントです。
 
 ```swift
 let client = CommandServiceClient.shared
@@ -302,33 +302,33 @@ let (output, exitCode) = try client.execute(
 
 ### ComposaSampleEffects
 
-Includes 3 sample effects:
+3つのサンプルエフェクトを含みます:
 
 | Effect | Description |
 |--------|-------------|
-| Pixelate | Mosaic effect |
-| RGB Shift | RGB channel offset |
-| Mirror | Horizontal flip |
+| Pixelate | モザイクエフェクト |
+| RGB Shift | RGB チャンネルずらし |
+| Mirror | 左右反転 |
 
 ### ComposaSampleTransitions
 
-Includes 2 sample transitions:
+2つのサンプルトランジションを含みます:
 
 | Transition | Description |
 |------------|-------------|
-| Zoom | Zoom-in transition |
-| Slide | Slide transition |
+| Zoom | ズームイン切替 |
+| Slide | スライド切替 |
 
 ---
 
 ## YouTube Plugin
 
-A plugin that plays YouTube videos as a real-time source.
-yt-dlp is bundled inside, so no additional installation is required.
+YouTube 動画をリアルタイムソースとして再生するプラグインです。
+yt-dlp がバンドル内に同梱されており、別途インストールは不要です。
 
-**Installation:**
+**インストール:**
 
-Copy `ComposaYouTubePlugin.bundle` to the Plugins folder:
+`ComposaYouTubePlugin.bundle` を Plugins フォルダにコピー:
 
 ```
 ~/Library/Application Support/ComposaVJ/Plugins/
@@ -340,11 +340,11 @@ Copy `ComposaYouTubePlugin.bundle` to the Plugins folder:
 
 - macOS 14.0+
 - Xcode 15.0+
-- Composa VJ (Free supports built-in plugins only; Pro required for custom plugins)
+- Composa VJ（Free 版では Built-in Plugin のみ、Pro でカスタム Plugin 対応）
 
 ## License
 
-See [LICENSE](./LICENSE) ([Japanese](./LICENSE-ja.md))
+[LICENSE](./LICENSE) を参照してください。（[日本語版](./LICENSE-ja.md)）
 
-- **SDK binary / YouTube Plugin**: Composa SDK License (free to develop & sell plugins; modification & redistribution prohibited)
-- **Sample code**: MIT License
+- **SDK バイナリ / YouTube Plugin**: Composa SDK License（プラグイン開発・販売自由、改変・再配布禁止）
+- **サンプルコード**: MIT License
