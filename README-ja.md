@@ -59,7 +59,7 @@ class MyPluginEntry: NSObject, PluginEntry {
 ~/Library/Application Support/ComposaVJ/Plugins/
 ```
 
-Composa VJ のギアメニュー → **Open Plugins Folder** で Finder から開けます。
+Composa VJ の config メニュー → **Open Plugins Folder** で Finder から開けます。
 
 ---
 

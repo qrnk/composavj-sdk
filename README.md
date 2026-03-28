@@ -59,7 +59,7 @@ Place the built `.bundle` in the Plugins folder:
 ~/Library/Application Support/ComposaVJ/Plugins/
 ```
 
-In Composa VJ, go to the gear menu → **Open Plugins Folder** to reveal it in Finder.
+In Composa VJ, go to the config menu → **Open Plugins Folder** to reveal it in Finder.
 
 ---
 
