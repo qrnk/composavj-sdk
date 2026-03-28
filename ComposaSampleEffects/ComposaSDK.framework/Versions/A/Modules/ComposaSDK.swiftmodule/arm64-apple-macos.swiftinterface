@@ -1,0 +1,308 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2.4 effective-5.10 (swiftlang-6.2.4.1.4 clang-1700.6.4.2)
+// swift-module-flags: -target arm64-apple-macos14.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name ComposaSDK
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2.4
+import Combine
+import CoreVideo
+import Foundation
+import Metal
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public protocol EffectRegisterable : AnyObject {
+  func register(_ effect: any ComposaSDK.EffectShader)
+  func register(_ effect: any ComposaSDK.EffectShader, bank: Swift.String)
+}
+public protocol TransitionRegisterable : AnyObject {
+  func register(_ transition: any ComposaSDK.TransitionShader)
+}
+public enum PluginFormField : Swift.Identifiable {
+  case text(id: Swift.String, label: Swift.String, placeholder: Swift.String)
+  case number(id: Swift.String, label: Swift.String, min: Swift.Double, max: Swift.Double, defaultValue: Swift.Double)
+  case selection(id: Swift.String, label: Swift.String, options: [ComposaSDK.SelectionOption])
+  public var id: Swift.String {
+    get
+  }
+  public typealias ID = Swift.String
+}
+public struct SelectionOption : Swift.Identifiable {
+  public let id: Swift.String
+  public let label: Swift.String
+  public init(id: Swift.String, label: Swift.String)
+  public typealias ID = Swift.String
+}
+@objc public protocol ComposaCommandServiceProtocol {
+  #if compiler(>=5.3) && $NonescapableTypes
+  @objc func execute(command: Swift.String, arguments: [Swift.String], environment: [Swift.String : Swift.String], reply: @escaping (Swift.String?, Swift.String?, Swift.Int32) -> Swift.Void)
+  #endif
+}
+@_hasMissingDesignatedInitializers final public class CommandServiceClient {
+  public static let shared: ComposaSDK.CommandServiceClient
+  final public func execute(command: Swift.String, arguments: [Swift.String], environment: [Swift.String : Swift.String] = [:]) throws -> (output: Swift.String, exitCode: Swift.Int32)
+  final public var isSandboxed: Swift.Bool {
+    get
+  }
+  @objc deinit
+}
+public typealias SessionID = Swift.String
+public typealias SetlistID = Swift.String
+public typealias ClipID = Swift.String
+public typealias SourceID = Swift.String
+public typealias OverlayID = Swift.String
+public typealias EffectID = Swift.String
+public enum BusID : Swift.String, Swift.Codable {
+  case a, b
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct SourceDefinition : Swift.Codable, Swift.Identifiable {
+  public let id: ComposaSDK.SourceID
+  public var name: Swift.String
+  public var type: ComposaSDK.SourceType
+  public var locator: ComposaSDK.SourceLocator
+  public var metadata: ComposaSDK.SourceMetadata?
+  public var cache: ComposaSDK.SourceCacheInfo?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(id: ComposaSDK.SourceID, name: Swift.String, type: ComposaSDK.SourceType, locator: ComposaSDK.SourceLocator, metadata: ComposaSDK.SourceMetadata?, cache: ComposaSDK.SourceCacheInfo?)
+  #endif
+  public typealias ID = ComposaSDK.SourceID
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public enum SourceType : Swift.String, Swift.Codable {
+  case videoFile, image, camera, generator, youtube, screenCapture
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum SourceLocator : Swift.Codable {
+  case fileURL(Swift.String)
+  case imageURL(Swift.String)
+  case cameraDeviceID(Swift.String)
+  case generatorID(Swift.String)
+  case youtubeURL(Swift.String)
+  case screenCaptureDisplayID(Swift.String)
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct SourceMetadata : Swift.Codable {
+  public var duration: Foundation.TimeInterval?
+  public var width: Swift.Int?
+  public var height: Swift.Int?
+  public var fps: Swift.Double?
+  public var codec: Swift.String?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(duration: Foundation.TimeInterval? = nil, width: Swift.Int? = nil, height: Swift.Int? = nil, fps: Swift.Double? = nil, codec: Swift.String? = nil)
+  #endif
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct SourceCacheInfo : Swift.Codable {
+  public var isCached: Swift.Bool
+  public var cachePath: Swift.String?
+  public var confirmedByUser: Swift.Bool?
+  public var bookmarkData: Foundation.Data?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(isCached: Swift.Bool, cachePath: Swift.String? = nil, confirmedByUser: Swift.Bool? = nil, bookmarkData: Foundation.Data? = nil)
+  #endif
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct VideoFrame {
+  public let timestamp: Foundation.TimeInterval
+  public let pixelBuffer: CoreVideo.CVPixelBuffer
+  public init(timestamp: Foundation.TimeInterval, pixelBuffer: CoreVideo.CVPixelBuffer)
+}
+public enum FrameResolveResult {
+  case videoFrame(ComposaSDK.VideoFrame)
+  case black
+  case failed
+}
+public protocol FrameProvider {
+  #if compiler(>=5.3) && $NonescapableTypes
+  func frame(at playhead: Foundation.TimeInterval) -> ComposaSDK.VideoFrame?
+  #endif
+  func prepare() async throws
+  var duration: Foundation.TimeInterval { get }
+}
+public protocol TransitionShader {
+  var id: Swift.String { get }
+  var name: Swift.String { get }
+  var fragmentShaderSource: Swift.String { get }
+  var fragmentFunctionName: Swift.String { get }
+  var controlType: ComposaSDK.TransitionControlType { get }
+}
+public enum TransitionControlType {
+  case smooth
+  case snap
+  public static func == (a: ComposaSDK.TransitionControlType, b: ComposaSDK.TransitionControlType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol EffectShader {
+  var id: Swift.String { get }
+  var name: Swift.String { get }
+  var fragmentShaderSource: Swift.String { get }
+  var fragmentFunctionName: Swift.String { get }
+  var parameters: [ComposaSDK.EffectParameter] { get }
+}
+public struct EffectParameter : Swift.Identifiable {
+  public let id: Swift.String
+  public var label: Swift.String
+  public var defaultValue: Swift.Double
+  public var min: Swift.Double
+  public var max: Swift.Double
+  public init(id: Swift.String, label: Swift.String, defaultValue: Swift.Double, min: Swift.Double, max: Swift.Double)
+  public typealias ID = Swift.String
+}
+public class EffectInstance : Swift.Identifiable, Foundation.ObservableObject {
+  final public let id: Swift.String
+  final public let shader: any ComposaSDK.EffectShader
+  @Combine.Published @_projectedValueProperty($parameterValues) public var parameterValues: [Swift.String : Swift.Double] {
+    get
+    @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+    set
+    @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+    _modify
+  }
+  public var $parameterValues: Combine.Published<[Swift.String : Swift.Double]>.Publisher {
+    get
+    @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
+    set
+  }
+  @Combine.Published @_projectedValueProperty($isBypassed) public var isBypassed: Swift.Bool {
+    get
+    @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+    set
+    @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+    _modify
+  }
+  public var $isBypassed: Combine.Published<Swift.Bool>.Publisher {
+    get
+    @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
+    set
+  }
+  public init(shader: any ComposaSDK.EffectShader)
+  public func normalizedValue(for paramID: Swift.String) -> Swift.Double
+  public func setNormalizedValue(_ normalized: Swift.Double, for paramID: Swift.String)
+  public typealias ID = Swift.String
+  public typealias ObjectWillChangePublisher = Combine.ObservableObjectPublisher
+  @objc deinit
+}
+public protocol SourcePlugin {
+  var id: Swift.String { get }
+  var name: Swift.String { get }
+  var sourceType: ComposaSDK.SourceType { get }
+  var isAvailable: Swift.Bool { get }
+  #if compiler(>=5.3) && $NonescapableTypes
+  var addSourceForm: [ComposaSDK.PluginFormField]? { get }
+  #endif
+  func createSource(from values: [Swift.String : Swift.String]) async throws -> ComposaSDK.SourceDefinition
+  #if compiler(>=5.3) && $NonescapableTypes
+  func createFrameProvider(for source: ComposaSDK.SourceDefinition) -> (any ComposaSDK.FrameProvider)?
+  #endif
+  func prepare(source: ComposaSDK.SourceDefinition) async throws -> ComposaSDK.SourceDefinition
+}
+extension ComposaSDK.SourcePlugin {
+  public var isAvailable: Swift.Bool {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public var addSourceForm: [ComposaSDK.PluginFormField]? {
+    get
+  }
+  #endif
+  public func createSource(from values: [Swift.String : Swift.String]) async throws -> ComposaSDK.SourceDefinition
+}
+@objc final public class PluginManager : ObjectiveC.NSObject, Foundation.ObservableObject {
+  weak final public var effectRegistry: (any ComposaSDK.EffectRegisterable)?
+  weak final public var transitionRegistry: (any ComposaSDK.TransitionRegisterable)?
+  final public var isPluginEnabled: Swift.Bool {
+    get
+  }
+  final public var currentLoadingBundleID: Swift.String?
+  public init(licenseProvider: any ComposaSDK.LicenseProvider = DevelopmentLicenseProvider())
+  final public func loadAllPlugins()
+  final public func register(_ plugin: any ComposaSDK.SourcePlugin)
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public func sourcePlugin(for type: ComposaSDK.SourceType) -> (any ComposaSDK.SourcePlugin)?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
+  final public func sourcePlugin(id: Swift.String) -> (any ComposaSDK.SourcePlugin)?
+  #endif
+  final public var allSourcePlugins: [any ComposaSDK.SourcePlugin] {
+    get
+  }
+  final public func registerEffect(_ effect: any ComposaSDK.EffectShader)
+  final public func registerEffect(_ effect: any ComposaSDK.EffectShader, bank: Swift.String)
+  final public func isPluginEffect(_ effectID: Swift.String) -> Swift.Bool
+  final public func isEffectAllowed(_ effectID: Swift.String) -> Swift.Bool
+  final public func registerTransition(_ transition: any ComposaSDK.TransitionShader)
+  final public func isPluginTransition(_ transitionID: Swift.String) -> Swift.Bool
+  final public func isTransitionAllowed(_ transitionID: Swift.String) -> Swift.Bool
+  public typealias ObjectWillChangePublisher = Combine.ObservableObjectPublisher
+  @objc deinit
+}
+@objc public protocol PluginEntry {
+  @objc func registerPlugins(manager: ComposaSDK.PluginManager)
+}
+final public class PluginLoader {
+  public struct LoadedPlugin : Swift.Identifiable {
+    public let id: Swift.String
+    public let name: Swift.String
+    public let bundlePath: Swift.String
+    public let bundleIdentifier: Swift.String?
+    public let version: Swift.String?
+    public typealias ID = Swift.String
+  }
+  final public var loadedPlugins: [ComposaSDK.PluginLoader.LoadedPlugin] {
+    get
+  }
+  public init()
+  public static var pluginDirectory: Foundation.URL {
+    get
+  }
+  final public func loadPlugins(in directory: Foundation.URL, manager: ComposaSDK.PluginManager)
+  final public func loadPlugin(at url: Foundation.URL, manager: ComposaSDK.PluginManager)
+  @objc deinit
+}
+public enum LicenseTier {
+  case free
+  case pro
+  public static func == (a: ComposaSDK.LicenseTier, b: ComposaSDK.LicenseTier) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public protocol LicenseProvider {
+  var currentTier: ComposaSDK.LicenseTier { get }
+}
+public struct DevelopmentLicenseProvider : ComposaSDK.LicenseProvider {
+  public var currentTier: ComposaSDK.LicenseTier {
+    get
+  }
+  public init()
+}
+extension ComposaSDK.BusID : Swift.Equatable {}
+extension ComposaSDK.BusID : Swift.Hashable {}
+extension ComposaSDK.BusID : Swift.RawRepresentable {}
+extension ComposaSDK.SourceType : Swift.Equatable {}
+extension ComposaSDK.SourceType : Swift.Hashable {}
+extension ComposaSDK.SourceType : Swift.RawRepresentable {}
+extension ComposaSDK.TransitionControlType : Swift.Equatable {}
+extension ComposaSDK.TransitionControlType : Swift.Hashable {}
+extension ComposaSDK.LicenseTier : Swift.Equatable {}
+extension ComposaSDK.LicenseTier : Swift.Hashable {}

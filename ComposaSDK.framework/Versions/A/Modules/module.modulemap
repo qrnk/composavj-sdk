@@ -1,0 +1,4 @@
+framework module ComposaSDK {
+  header "ComposaSDK-Swift.h"
+  requires objc
+}
