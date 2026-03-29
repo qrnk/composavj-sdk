@@ -3,22 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>files</key>
-	<dict>
-		<key>Resources/yt-dlp</key>
-		<data>
-		mwVx9mozWd841mIRshjqTZooK8M=
-		</data>
-	</dict>
+	<dict/>
 	<key>files2</key>
-	<dict>
-		<key>Resources/yt-dlp</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			6AxHs85xKs7lHV49Tqzi0YG0TTjxlCw6MuPH/1PNntU=
-			</data>
-		</dict>
-	</dict>
+	<dict/>
 	<key>rules</key>
 	<dict>
 		<key>^Resources/</key>

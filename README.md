@@ -12,7 +12,8 @@ Build custom **Effect**, **Transition**, and **Source** plugins with ComposaSDK.
 | `ComposaSDK.framework/` | SDK binary (macOS, arm64/x86_64) |
 | `ComposaSampleEffects/` | Effect plugin samples (Pixelate, RGB Shift, Mirror) |
 | `ComposaSampleTransitions/` | Transition plugin samples (Zoom, Slide) |
-| `ComposaYouTubePlugin.bundle/` | YouTube source plugin |
+| `ComposaYouTubePlugin/` | YouTube source plugin (source code + Xcode project) |
+| `ComposaYouTubePlugin.bundle/` | YouTube source plugin (pre-built binary) |
 
 ## Quick Start
 
@@ -324,7 +325,9 @@ Includes 2 sample transitions:
 ## YouTube Plugin
 
 A plugin that plays YouTube videos as a real-time source.
-yt-dlp is bundled inside, so no additional installation is required.
+No additional installation is required. The plugin uses URLSession to access YouTube's API directly.
+
+Full source code is available in the `ComposaYouTubePlugin/` directory.
 
 **Installation:**
 

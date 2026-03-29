@@ -12,7 +12,8 @@ ComposaSDK.framework を使って、カスタム **Effect**・**Transition**・*
 | `ComposaSDK.framework/` | SDK バイナリ（macOS, arm64/x86_64） |
 | `ComposaSampleEffects/` | Effect プラグインサンプル（Pixelate, RGB Shift, Mirror） |
 | `ComposaSampleTransitions/` | Transition プラグインサンプル（Zoom, Slide） |
-| `ComposaYouTubePlugin.bundle/` | YouTube ソースプラグイン |
+| `ComposaYouTubePlugin/` | YouTube ソースプラグイン（ソースコード + Xcode プロジェクト） |
+| `ComposaYouTubePlugin.bundle/` | YouTube ソースプラグイン（ビルド済みバイナリ） |
 
 ## Quick Start
 
@@ -324,7 +325,9 @@ let (output, exitCode) = try client.execute(
 ## YouTube Plugin
 
 YouTube 動画をリアルタイムソースとして再生するプラグインです。
-yt-dlp がバンドル内に同梱されており、別途インストールは不要です。
+外部ツールのインストールは不要です。URLSession で YouTube API に直接アクセスします。
+
+ソースコードは `ComposaYouTubePlugin/` ディレクトリに含まれています。
 
 **インストール:**
 
